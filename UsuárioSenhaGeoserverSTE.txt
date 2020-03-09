@@ -1,0 +1,7 @@
+usuário: admin
+
+senha antiga:
+info.ste225
+
+senha nova
+ste#info2020
