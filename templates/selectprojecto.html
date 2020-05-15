@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Select Project</title>
+  </head>
+  <body>
+    {% extends "template.html" %}
+    {% block content %}
+    
+    <div class="container">
+    
+   <p> Selecione o projeto: </p>
+    <select name= listaprj method="GET" action="/">
+    {% for prj in listaprj %}
+    <option value= "{{prj}}" SELECTED>{{prj}}</option>"
+    {% endfor %}
+    </select>
+
+    <p> {{ tulpa }} </p>
+
+
+
+
+    </div>
+    {% endblock content %}
+  </body>
+</html>
