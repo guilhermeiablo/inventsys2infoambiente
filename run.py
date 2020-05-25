@@ -526,15 +526,15 @@ def selectproject():
 	    listaprj.append(variavelprj)
 	    variavelnome=(str(nome))
 	    listanomes.append(variavelnome)
-	tulpa = [(x, y) for x, y in zip(listaprj, listanomes)]
+	#tulpa = [(x, y) for x, y in zip(listaprj, listanomes)]
 	
-	form = ProjectForm()
-	form.selecionaprojeto.choices
+	#form = ProjectForm()
+	#form.selecionaprojeto.choices
 
 	#form = UserDetails(request.POST, obj=tulpa)
 	#form.group_id.choices = [(g.id, g.name) for g in Group.query.order_by('id')]
 
-	return render_template('selectprojecto.html', title='SelectProject', mytoken=mytoken, listaprj=listaprj, tulpa=tulpa)
+	return render_template('selectprojecto.html', title='SelectProject', mytoken=mytoken, listaprj=listaprj)
     
 if __name__ == "__main__":
     app.run(debug=True)

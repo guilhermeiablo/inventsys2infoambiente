@@ -8,5 +8,5 @@ class LoginFormInventsys(FlaskForm):
 	remember = BooleanField('Salvar meus dados')
 	submit= SubmitField('Enviar') 
 
-class ProjectForm(FlaskForm):
-    selecionaprojeto = SelectField('Group', choices=tulpa)
+#class ProjectForm(FlaskForm):
+    #selecionaprojeto = SelectField('Group', choices=tulpa)
