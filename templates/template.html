@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
     <!-- Required meta tags -->
@@ -10,22 +10,43 @@
 
     <!-- Material Design for Bootstrap CSS -->
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
-    <title>Flask Parent Template</title>
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static',    filename='img/favicon/apple-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static',    filename='img/favicon/apple-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static',    filename='img/favicon/apple-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static',    filename='img/favicon/apple-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static',    filename='img/favicon/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static',    filename='img/favicon/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static',    filename='img/favicon/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static',    filename='img/favicon/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static',    filename='img/favicon/apple-icon-180x180.png') }}">
+    <link rel="icon" sizes="192x192" href="{{ url_for('static',    filename='img/favicon/android-icon-192x192.png') }}">
+    <link rel="icon" sizes="32x32" href="{{ url_for('static',    filename='img/favicon/favicon-32x32.png') }}">
+    <link rel="icon" sizes="96x96" href="{{ url_for('static',    filename='img/favicon/favicon-96x96.png') }}">
+    <link rel="icon" sizes="16x16" href="{{ url_for('static',    filename='img/favicon/favicon-16x16.png') }}">
+    <link rel="manifest" href="{ url_for('static',    filename='img/favicon/manifest.json) }}">
+    
+
+
+
+
+    <title>Inventsys2Infoambiente Template</title>
     
     <link rel="stylesheet" href="{{ url_for('static',    filename='css/template.css') }}">
     
 </head>
   <body>
     <header>
-      <div class="container">
-        <h1 class="logo">Inventsys 2 Infoambiente App</h1>
-        <strong><nav>
-          <ul class="menu">
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('about') }}">About</a></li>
-          </ul>
-        </nav></strong>
-      </div>
+      <nav class="navbar navbar-light bg-light" style="float:none;margin:0 auto;display: block;    text-align: center;">
+        <a class="navbar-brand" href="{{ url_for('home') }}">
+          <img src="{{ url_for('static',    filename='img/logo.png') }}" width="auto" height="30" class="d-inline-block align-top" alt="">
+          
+        </a>
+      </nav>
+
+      
     </header>
  
  <div class="container">   

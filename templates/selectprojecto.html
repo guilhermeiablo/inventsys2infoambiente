@@ -2,27 +2,85 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Select Project</title>
+    <title>Login Inventsys</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static',    filename='css/login.css') }}">
+
+
+    
+
   </head>
   <body>
     {% extends "template.html" %}
+
+
     {% block content %}
-    
-    <div class="container">
-    
-   <p> Selecione o projeto: </p>
-    <select name= listaprj method="GET" action="/">
-    {% for prj in listaprj %}
-    <option value= "{{prj}}" SELECTED>{{prj}}</option>"
-    {% endfor %}
-    </select>
 
-    <p> {{ tulpa }} </p>
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="col-md-6">
+            <img src="{{ url_for('static',    filename='img/Etapas-02.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
+          </div>
+        </div> 
+        
 
-
-
-
+        <div class="row">
+          <div class="col-md-5"></div>
+          <div class="col-md-2">
+            <img src="{{ url_for('static',    filename='img/inventsys.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
+          </div>
+        </div> 
+        
+        
     </div>
+   
+
+
+    <div class="row" style="background-color: #B6853D">
+            
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="container">
+                <div class="content-section">
+
+                    
+                        <fieldset class="form-group">
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;"></br>Selecione uma operação Inventsys</legend>
+                            <div class="form-group">
+                                <select name= listaprj method="GET" action="/" class="form-control">
+                                {% for prj in listaprj %}
+                                <option value= "{{prj}}" SELECTED>{{prj}}</option>"
+                                {% endfor %}
+                                </select>
+                            </div>
+                            <p> {{ tulpa }} </p>
+                            
+                            
+                        </fieldset>
+                        
+                        
+                    
+
+
+
+                  
+                  
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+        
+
+
+   
+      
     {% endblock content %}
   </body>
 </html>
