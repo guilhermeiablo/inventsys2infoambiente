@@ -1,481 +1,45 @@
-from flask import Flask, render_template, url_for, flash, redirect, request
+from flask import Flask, Blueprint, render_template, url_for, flash, redirect, request, jsonify, session
+from flask_session import Session
+#from flask_sqlalchemy import SQLAlchemy
 from getpass import getpass
+import random , string
 import requests
 import json
-from forms import LoginFormInventsys
+from forms import LoginFormInventsys, ProjectForm, CategoryForm, LoginFormPostgis
+import psycopg2
+from psycopg2 import sql
 
 app = Flask(__name__)
 
+
 app.config['SECRET_KEY'] = '89247hrgr8ewr4uk'
+SESSION_TYPE = 'filesystem'
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///store.db'
+#db = SQLAlchemy(app)
 
+app.config.from_object(__name__)
+Session(app)
 
-def getprojetos():
-	#Enviar request GET para receber um json com todos os ativos do projeto escolhido
-	payload = {}
-	headers = {
-    
-  		'Account': 'stesa',
-  		'Token': mytoken,
-	}
-	prjurl = 'https://api.inventsys.com.br/v4/projects'
-	projetos = requests.request('GET', prjurl, headers=headers, data=payload, allow_redirects=False)
-	listaprojetos = projetos.json()['projects']
 
+# function for generation of random string
+def generate_random_string(stringLength=10):
+  letters = string.ascii_lowercase
+  return ''.join(random.choice(letters) for i in range(stringLength))
 
-def selectprojeto():
-	import ipywidgets as widgets
-	from ipywidgets import interact
 
 
-	variavelprj=""
-	listaprj=[]
-	for i in range(0,len(projetos.json()['projects'])):
-	    prj=(projetos.json()['projects'][i]['id'])
-	    nome=(projetos.json()['projects'][i]['name'])
-	    variavelprj=(str(prj))
-	    listaprj.append(variavelprj)
 
-	print('Informa ID do projeto no inventsys: ')
-
-	menuprj = widgets.Dropdown(
-	    options=listaprj,
-	    value='10762',
-	    description='Projeto:',
-	)
-
-
-	menuprj
-
-	botaoprojeto=widgets.Button(
-	    description='Submeter',
-	    disabled=False,
-	    button_style='', # 'success', 'info', 'warning', 'danger' or ''
-	    tooltip='Click me',
-	    icon='check'
-	)
-
-
-	outputprojeto = widgets.Output()
-
-	display(menuprj, botaoprojeto, outputprojeto)
-	outputprojeto
-	projectid=''
-	def on_button_clicked_prj(b):
-	    global projectid
-	    with outputprojeto:
-	        projectid = menuprj.value
-	        print('Projeto selecionado: '+projectid)
-        
-
-
-	botaoprojeto.on_click(on_button_clicked_prj)
-
-
-def getcategorias():
-	caturl = 'https://api.inventsys.com.br/v4/projects/'+projectid+'/categories'
-	categorias = requests.request('GET', caturl, headers=headers, data=payload, allow_redirects=False)
-	#print(categorias.json()['categories'])
-
-
-def selectcategoria():
-	catvariavel=""
-	catlista=[]
-	for i in range(0,len(categorias.json()['categories'])):
-		cat=(categorias.json()['categories'][i]['id'])
-		nome=(categorias.json()['categories'][i]['name'])
-		catvariavel=(str(cat))
-		catlista.append(catvariavel)
-
-	print('Informa ID da categoria no inventsys: ')
-	menucat = widgets.Dropdown(
-	    options=catlista,
-	    value=catlista[0],
-	    description='Categoria:',
-	)
-
-
-	menucat
-
-	botaocat=widgets.Button(
-	    description='Submeter',
-	    disabled=False,
-	    button_style='', # 'success', 'info', 'warning', 'danger' or ''
-	    tooltip='Click me',
-	    icon='check'
-	)
-
-
-	outputcat = widgets.Output()
-
-	display(menucat, botaocat, outputcat)
-
-	categoryid=''
-	def on_button_clicked_cat(b):
-	    global categoryid
-	    with outputcat:
-	        categoryid = menucat.value
-	        print('Categoria selecionada: '+categoryid)
-
-	botaocat.on_click(on_button_clicked_cat)
-
-
-def getregistros():
-	page = 1
-	registros = []
-	while True:
-	    try:
-	        url = 'https://api.inventsys.com.br/v4/projects/'+projectid+'/items?category='+categoryid+'&pagesize=1&page='+str(page)
-	        ativos = requests.request('GET', url, headers=headers, data=payload, allow_redirects=False)
-	        
-	        
-	        
-	                
-	        #print(ativos.json()['items'])
-	        registros = registros + ativos.json()['items']
-	        
-	        #Se quiser ver os dados estruturados na resposta completa:
-	        #print(ativos.text)
-	        
-	        #Se quiser ver os headers:
-	        #print(ativos.headers)
-	    except HTTPError:
-	        # handle HTTPError
-	        logging.error('HTTPError')
-	    # ... put any other Exception you need to handle here
-	    except IndexError:
-	        break
-	    except Exception as e:
-	        # for handle unknown exception
-	        logging.error('Unknown exception')
-	    else:
-	        if len(ativos.json()['items'])==0:
-	            break
-	        else:
-	            page += 1
-
-	print(registros)
-
-
-def connecttopostgres():
-	import psycopg2
-	from psycopg2 import sql
-
-	#Abrir os trabalhos para trabalhar com Postgres. Criar conexão e cursor como base.
-	#conn = psycopg2.connect("host=localhost dbname=postgres user=guilhermeiablonovski")
-	#cur = conn.cursor()
-
-
-
-	hostinput = input('Informa host (localhost): ')
-	dbnameinput = input('Informa dbname (postgres): ')
-	userinput = input('Informa user (guilhermeiablonovski): ')
-
-
-	#Define our connection string
-	conn_string = "host="+str(hostinput)+" dbname="+str(dbnameinput)+" user="+str(userinput)
-	 
-	# print the connection string we will use to connect
-	print('Connecting to database->%s' % (conn_string))
-	 
-	# get a connection, if a connect cannot be made an exception will be raised here
-	conn = psycopg2.connect(conn_string)
-	 
-	# conn.cursor will return a cursor object, you can use this cursor to perform queries
-	cur = conn.cursor()
-	print('Connected!\n')
-
-
-def createtable():
-	dropdbgenerica = """DROP TABLE IF EXISTS {}""" 
-
-
-	createdbgenerica = """CREATE UNLOGGED TABLE IF NOT EXISTS {}(
-	id integer PRIMARY KEY,
-	created_at DATE,
-	updated_at DATE,
-	name text,
-	image text,
-	project text,
-	category_id integer,
-	category_name text,
-	latitude real,
-	longitude real
-	);""" 
-
-	nometabela=projectid+'_'+categoryid
-
-
-
-	dbobracorrente = """DROP TABLE IF EXISTS egrfauna_obracorrente;
-	CREATE UNLOGGED TABLE IF NOT EXISTS egrfauna_obracorrente(
-	id integer PRIMARY KEY,
-	created_at DATE,
-	updated_at DATE,
-	name text,
-	image text,
-	project text,
-	category_id integer,
-	category_name text,
-	latitude real,
-	longitude real,
-	tipo text,
-	dimensao_passagem text,
-	grau_obstrucao integer,
-	natureza_obstrucao text
-	);""" 
-
-
-	dbobraespecial = """DROP TABLE IF EXISTS egrfauna_obraespecial;
-	CREATE UNLOGGED TABLE IF NOT EXISTS egrfauna_obraespecial(
-	id integer PRIMARY KEY,
-	created_at DATE,
-	updated_at DATE,
-	name text,
-	image text,
-	project text,
-	category_id integer,
-	category_name text,
-	latitude real,
-	longitude real,
-	tipo text,
-	largura_passagem real,
-	altura_passagem real,
-	margem_seca text,
-	grau_obstrucao text,
-	natureza_obstrucao text,
-	);""" 
-
-
-	dbarmadilhas = """DROP TABLE IF EXISTS egrfauna_armadilhas;
-	CREATE UNLOGGED TABLE IF NOT EXISTS egrfauna_armadilhas(
-	id integer PRIMARY KEY,
-	created_at DATE,
-	updated_at DATE,
-	name text,
-	image text,
-	project text,
-	category_id integer,
-	category_name text,
-	latitude real,
-	longitude real,
-	observacoes text,
-	instalacao DATE,
-	IDcartao text,
-	IDcamera text,
-	IDbueiro text,
-	estrada text,
-	foto_armadilha text,
-	gps_lat real,
-	gps_long real,
-	gps_alt real,
-	gps_acc real);""" 
-	    
-
-	dbatropelamentos = """DROP TABLE IF EXISTS egrfauna_atropelamentos;
-	CREATE UNLOGGED TABLE IF NOT EXISTS egrfauna_atropelamentos(
-	id integer PRIMARY KEY,
-	created_at DATE,
-	updated_at DATE,
-	name text,
-	image text,
-	project text,
-	category_id integer,
-	category_name text,
-	latitude real,
-	longitude real,
-	estrada text,
-	grupo text,
-	esp_mamifero text,
-	esp_ave text,
-	esp_reptil text,
-	esp_anfibio text,
-	esp_outro text,
-	idade text,
-	estado text,
-	posicao text,
-	id_etiqueta text,
-	nome_comum text,
-	sexo text,
-	observacoes text,
-	ponto_gps text
-	);"""
-
-
-
-	if categoryid=='20685':
-	    cur.execute(dbarmadilhas)
-	else:
-	    if categoryid=='20686':
-	        cur.execute(dbatropelamentos)
-	    else:
-	        if categoryid=='18278':
-	            cur.execute(dbobraespecial)
-	        else:
-	            if categoryid=='18284':
-	                cur.execute(dbobracorrente)
-	            else:
-	                cur.execute(sql.SQL(dropdbgenerica)
-	                            .format(sql.Identifier(nometabela)))
-	                cur.execute(sql.SQL(createdbgenerica)
-	                            .format(sql.Identifier(nometabela)))
-
-	conn.commit()
-
-
-def insertvalues():
-	categoriasegr={'18284', '18278', '20685', '20686'}
-	    
-
-
-	if categoryid not in categoriasegr:
-	    for item in registros:
-	        genericfields=[
-	            item['id'],
-	            item['created_at'],
-	            item['updated_at'],
-	            item['name'],
-	            item['image'],
-	            item['project']['name'],
-	            item['category_id'],
-	            item['category']['name'],
-	            item['location']['lat'],
-	            item['location']['lng']
-	        ]
-	        my_data=[field for field in genericfields]
-	        cur.execute(sql.SQL("INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)").format(sql.Identifier(nometabela)),tuple(my_data))
-	else:
-	    print('.')
-	    
-	    
-	if categoryid=='18284':
-	        for item in registros:
-	            obracorrentefields = [
-	            item['id'],
-	            item['created_at'],
-	            item['updated_at'],
-	            item['name'],
-	            item['image'],
-	            item['project']['name'],
-	            item['category_id'],
-	            item['category']['name'],
-	            item['location']['lat'],
-	            item['location']['lng'],
-	            item['info'][0]['value'],
-	            item['info'][1]['value'],
-	            item['info'][2]['value'],
-	            item['info'][3]['value']
-	            ]
-	            my_data = [field for field in obracorrentefields]
-	            cur.execute("INSERT INTO egrfauna_obracorrente VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", tuple(my_data))
-	else:
-	    print('.')
-
-
-	if categoryid=='18278':
-	    for item in registros:
-	        obraespecialfields = [
-	        item['id'],
-	        item['created_at'],
-	        item['updated_at'],
-	        item['name'],
-	        item['image'],
-	        item['project']['name'],
-	        item['category_id'],
-	        item['category']['name'],
-	        item['location']['lat'],
-	        item['location']['lng'],
-	        item['info'][0]['value'],
-	        item['info'][1]['value'],
-	        item['info'][2]['value'],
-	        item['info'][3]['value'],
-	        item['info'][4]['value'],
-	        item['info'][5]['value']
-	        ]
-	        my_data = [field for field in obraespecialfields]
-	        cur.execute("INSERT INTO egrfauna_obraespecial VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", tuple(my_data))
-	else:
-	    print('.')
-
-
-
-	if categoryid=='20685':
-	    for item in registros:
-	        armadilhafields = [
-	        item['id'],
-	        item['created_at'],
-	        item['updated_at'],
-	        item['name'],
-	        item['image'],
-	        item['project']['name'],
-	        item['category_id'],
-	        item['category']['name'],
-	        item['location']['lat'],
-	        item['location']['lng'],
-	        item['info'][0]['value'],
-	        item['info'][1]['value'],
-	        item['info'][2]['value'],
-	        item['info'][3]['value'],
-	        item['info'][4]['value'],
-	        item['info'][5]['value'],
-	        item['info'][6]['value'],
-	        item['info'][7]['value'],
-	        item['info'][8]['value'],
-	        item['info'][9]['value'],
-	        item['info'][10]['value'],
-	        ]
-	        my_data = [field for field in armadilhafields]
-	        cur.execute("INSERT INTO egrfauna_armadilhas VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", tuple(my_data))
-	else:
-	        print('.')
-	    
-	if categoryid=='20686':
-	    for item in registros:
-	        atropelamentofields = [
-	        item['id'],
-	        item['created_at'],
-	        item['updated_at'],
-	        item['name'],
-	        item['image'],
-	        item['project']['name'],
-	        item['category_id'],
-	        item['category']['name'],
-	        item['location']['lat'],
-	        item['location']['lng'],
-	        item['info'][0]['value'],
-	        item['info'][1]['value'],
-	        item['info'][2]['value'],
-	        item['info'][3]['value'],
-	        item['info'][4]['value'],
-	        item['info'][5]['value'],
-	        item['info'][6]['value'],
-	        item['info'][7]['value'],
-	        item['info'][8]['value'],
-	        item['info'][9]['value'],
-	        item['info'][10]['value'],
-	        item['info'][11]['value'],
-	        item['info'][12]['value'],
-	        item['info'][13]['value'],
-	        item['info'][14]['value']
-	        ]
-	        my_data = [field for field in atropelamentofields]
-	        cur.execute("INSERT INTO egrfauna_atropelamentos VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", tuple(my_data))
-	else:
-	    print('.')
-	    
-	conn.commit()
 	    
 	    
 	    
 
 @app.route("/")
 def home():
+	session['u_id'] = generate_random_string()
 	return render_template("home.html")
     
-@app.route("/about")
-def about():
-    return render_template("about.html")
 
-mytoken='a'
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def validateinventsys():
@@ -493,18 +57,20 @@ def validateinventsys():
 
 
 		if r:
-			global mytoken
-			mytoken = r.json()['token']
+			
+			session['mytoken'] = r.json()['token']
 			flash(f'Login realizado com sucesso para {form.username.data}!', 'success')
-			return redirect(url_for('selectproject', mytoken=mytoken))
+			return redirect(url_for('selectproject', mytoken=session['mytoken']))
 		else:
 			flash('Login não realizado. Verifique o usuário e a senha.', 'danger')
 	return render_template('logininventsys.html', title='LoginInventsys', form=form)
 
 
+
+
 @app.route("/selectproject", methods=['GET', 'POST'])
 def selectproject():
-	global mytoken
+	mytoken=session.get('mytoken')
 	payload = {}
 	headers = {
     
@@ -526,15 +92,505 @@ def selectproject():
 	    listaprj.append(variavelprj)
 	    variavelnome=(str(nome))
 	    listanomes.append(variavelnome)
-	#tulpa = [(x, y) for x, y in zip(listaprj, listanomes)]
+	tulpa = [(x, y) for x, y in zip(listaprj, listanomes)]
 	
-	#form = ProjectForm()
-	#form.selecionaprojeto.choices
+	form = ProjectForm()
+	form.selecionaprojeto.choices = tulpa
+	
 
-	#form = UserDetails(request.POST, obj=tulpa)
-	#form.group_id.choices = [(g.id, g.name) for g in Group.query.order_by('id')]
+	if form.validate_on_submit():	
+		if projetos:
+			session['project'] = str(form.selecionaprojeto.data)
+			flash(f'Projeto {form.selecionaprojeto.data} selecionado com sucesso!', 'success')
+			return redirect(url_for('selectcategory', mytoken=session['mytoken'], project=session['project']))
+		else:
+			flash('Projeto não pode ser selecionado. Tente novamente.', 'danger')
 
-	return render_template('selectprojecto.html', title='SelectProject', mytoken=mytoken, listaprj=listaprj)
+
+
+	return render_template('selectprojecto.html', title='SelectProject', mytoken=mytoken, form=form)
+
+
+
+
+@app.route("/selectcategory", methods=['GET', 'POST'])
+def selectcategory():
+	
+	mytoken=session.get('mytoken')
+	payload = {}
+	headers = {
+    
+  		'Account': 'stesa',
+  		'Token': mytoken,
+	}
+	projectid = session.get('project')
+
+	caturl = 'https://api.inventsys.com.br/v4/projects/'+projectid+'/categories'
+	categorias = requests.request('GET', caturl, headers=headers, data=payload, allow_redirects=False)
+
+	catvariavel=""
+	variavelnome=""
+	catlista=[]
+	listanomes=[]
+	for i in range(0,len(categorias.json()['categories'])):
+	    cat=(categorias.json()['categories'][i]['id'])
+	    nome=(categorias.json()['categories'][i]['name'])
+	    catvariavel=(str(cat))
+	    catlista.append(catvariavel)
+	    variavelnome=(str(nome))
+	    listanomes.append(variavelnome)
+	tulpa = [(x, y) for x, y in zip(catlista, listanomes)]
+
+	form = CategoryForm()
+	form.selecionacategoria.choices = tulpa
+
+	if form.validate_on_submit():	
+		if categorias:
+			session['category'] = str(form.selecionacategoria.data)
+			flash(f'Categoria {form.selecionacategoria.data} selecionado com sucesso!', 'success')
+			return redirect(url_for('loginpostgis', mytoken=session['mytoken'], project=session['project'], category=session['category']))
+		else:
+			flash('Categoria não pode ser selecionada. Tente novamente.', 'danger')
+
+
+
+	return render_template('selectcategory.html', title='SelectCategory', mytoken=mytoken, form=form)
+
+
+
+
+@app.route("/loginpostgis", methods=['GET', 'POST'])
+def loginpostgis():
+	mytoken=session.get('mytoken')
+	payload = {}
+	headers = {
+    
+  		'Account': 'stesa',
+  		'Token': mytoken,
+	}
+	page = 1
+	registros = []
+	projectid = session.get('project')
+	categoryid = session.get('category')
+	while True:
+	    try:
+	        url = 'https://api.inventsys.com.br/v4/projects/'+projectid+'/items?category='+categoryid+'&pagesize=1&page='+str(page)
+	        ativos = requests.request('GET', url, headers=headers, data=payload, allow_redirects=False)
+	        
+	        registros = registros + ativos.json()['items']
+	        
+	    except HTTPError:
+	        # handle HTTPError
+	        logging.error('HTTPError')
+	    # ... put any other Exception you need to handle here
+	    except IndexError:
+	        break
+	    except Exception as e:
+	        # for handle unknown exception
+	        logging.error('Unknown exception')
+	    else:
+	        if len(ativos.json()['items'])==0:
+	            break
+	        else:
+	            page += 1
+
+
+	form = LoginFormPostgis()
+	if form.validate_on_submit():
+		session['hostinput'] = str(form.hostinput.data)
+		session['dbnameinput'] = str(form.dbnameinput.data)
+		session['userinput'] = str(form.userinput.data)
+		session['senhainput'] = str(form.senhainput.data)
+		#Define our connection string
+		conn_string = "host="+str(session.get('hostinput'))+" dbname="+str(session.get('dbnameinput'))+" user="+str(session.get('userinput'))+" password="+str(session.get('senhainput'))
+		 
+		 
+		# get a connection, if a connect cannot be made an exception will be raised here
+		conn = psycopg2.connect(conn_string)
+		 
+		# conn.cursor will return a cursor object, you can use this cursor to perform queries
+		cur = conn.cursor()
+
+
+		if conn:
+			
+			flash(f'Dados enviados com sucesso para {form.dbnameinput.data}!', 'success')
+
+			projectid=session.get('project')
+			categoryid=session.get('category')
+			
+
+			dropdbgenerica = """CREATE EXTENSION IF NOT EXISTS postgis;
+			DROP TABLE IF EXISTS {}""" 
+
+			nometabela=projectid+'_'+categoryid
+
+			createdbgenerica = """CREATE UNLOGGED TABLE IF NOT EXISTS {}(
+			id integer PRIMARY KEY,
+			created_at DATE,
+			updated_at DATE,
+			name text,
+			image text,
+			project text,
+			category_id integer,
+			category_name text,
+			latitude real,
+			longitude real,
+			geom geometry(Point, 4326)
+			);""" 
+
+
+
+
+			dbobracorrente = """CREATE EXTENSION IF NOT EXISTS postgis;
+			DROP TABLE IF EXISTS {};
+			CREATE UNLOGGED TABLE IF NOT EXISTS {}(
+			id integer PRIMARY KEY,
+			created_at DATE,
+			updated_at DATE,
+			name text,
+			image text,
+			project text,
+			category_id integer,
+			category_name text,
+			latitude real,
+			longitude real,
+			tipo text,
+			dimensao_passagem text,
+			grau_obstrucao integer,
+			natureza_obstrucao text,
+			geom geometry(Point, 4326)
+			);""" 
+
+
+			dbobraespecial = """CREATE EXTENSION IF NOT EXISTS postgis;
+			DROP TABLE IF EXISTS {};
+			CREATE UNLOGGED TABLE IF NOT EXISTS {}(
+			id integer PRIMARY KEY,
+			created_at DATE,
+			updated_at DATE,
+			name text,
+			image text,
+			project text,
+			category_id integer,
+			category_name text,
+			latitude real,
+			longitude real,
+			tipo text,
+			largura_passagem real,
+			altura_passagem real,
+			margem_seca text,
+			grau_obstrucao text,
+			natureza_obstrucao text,
+			geom geometry(Point, 4326)
+			);""" 
+
+
+			dbarmadilhas = """CREATE EXTENSION IF NOT EXISTS postgis;
+			DROP TABLE IF EXISTS {};
+			CREATE UNLOGGED TABLE IF NOT EXISTS {}(
+			id integer PRIMARY KEY,
+			created_at DATE,
+			updated_at DATE,
+			name text,
+			image text,
+			project text,
+			category_id integer,
+			category_name text,
+			latitude real,
+			longitude real,
+			observacoes text,
+			instalacao DATE,
+			IDcartao text,
+			IDcamera text,
+			IDbueiro text,
+			estrada text,
+			foto_armadilha text,
+			gps_lat real,
+			gps_long real,
+			gps_alt real,
+			gps_acc real,
+			geom geometry(Point, 4326)
+			);""" 
+			    
+
+			dbatropelamentos = """CREATE EXTENSION IF NOT EXISTS postgis;
+			DROP TABLE IF EXISTS {};
+			CREATE UNLOGGED TABLE IF NOT EXISTS {}(
+			id integer PRIMARY KEY,
+			created_at DATE,
+			updated_at DATE,
+			name text,
+			image text,
+			project text,
+			category_id integer,
+			category_name text,
+			latitude real,
+			longitude real,
+			estrada text,
+			grupo text,
+			esp_mamifero text,
+			esp_ave text,
+			esp_reptil text,
+			esp_anfibio text,
+			esp_outro text,
+			idade text,
+			estado text,
+			posicao text,
+			id_etiqueta text,
+			nome_comum text,
+			sexo text,
+			observacoes text,
+			ponto_gps text,
+			geom geometry(Point, 4326)
+			);"""
+
+
+
+			if categoryid=='20685':
+			    cur.execute(sql.SQL(dbarmadilhas)
+			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
+			    tabelagerada=projectid+'_'+categoryid
+			else:
+			    if categoryid=='20686':
+			        cur.execute(sql.SQL(dbatropelamentos)
+			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
+			        tabelagerada=projectid+'_'+categoryid
+			    else:
+			        if categoryid=='18278':
+			            cur.execute(sql.SQL(dbobraespecial)
+			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
+			            tabelagerada=projectid+'_'+categoryid
+			        else:
+			            if categoryid=='18284':
+			                cur.execute(sql.SQL(dbobracorrente)
+			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
+			                tabelagerada=projectid+'_'+categoryid
+			            else:
+			                cur.execute(sql.SQL(dropdbgenerica)
+			                            .format(sql.Identifier(nometabela)))
+			                cur.execute(sql.SQL(createdbgenerica)
+			                            .format(sql.Identifier(nometabela)))
+			                tabelagerada=projectid+'_'+categoryid
+
+			conn.commit()
+
+			categoriasegr={'18284', '18278', '20685', '20686'}
+		    
+
+
+			if categoryid not in categoriasegr:
+			    for item in registros:
+			        genericfields=[
+			            item['id'],
+			            item['created_at'],
+			            item['updated_at'],
+			            item['name'],
+			            item['image'],
+			            item['project']['name'],
+			            item['category_id'],
+			            item['category']['name'],
+			            item['location']['lat'],
+			            item['location']['lng']
+			        ]
+			        my_data=[field for field in genericfields]
+			        cur.execute(sql.SQL("INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)").format(sql.Identifier(nometabela)),tuple(my_data))
+			else:
+			    print('.')
+			    
+			    
+			if categoryid=='18284':
+			        for item in registros:
+			            obracorrentefields = [
+			            item['id'],
+			            item['created_at'],
+			            item['updated_at'],
+			            item['name'],
+			            item['image'],
+			            item['project']['name'],
+			            item['category_id'],
+			            item['category']['name'],
+			            item['location']['lat'],
+			            item['location']['lng'],
+			            item['info'][0]['value'],
+			            item['info'][1]['value'],
+			            item['info'][2]['value'],
+			            item['info'][3]['value']
+			            ]
+			            my_data = [field for field in obracorrentefields]
+			            cur.execute(sql.SQL("INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)").format(sql.Identifier(nometabela)), tuple(my_data))
+			else:
+			    print('.')
+
+
+			if categoryid=='18278':
+			    for item in registros:
+			        obraespecialfields = [
+			        item['id'],
+			        item['created_at'],
+			        item['updated_at'],
+			        item['name'],
+			        item['image'],
+			        item['project']['name'],
+			        item['category_id'],
+			        item['category']['name'],
+			        item['location']['lat'],
+			        item['location']['lng'],
+			        item['info'][0]['value'],
+			        item['info'][1]['value'],
+			        item['info'][2]['value'],
+			        item['info'][3]['value'],
+			        item['info'][4]['value'],
+			        item['info'][5]['value']
+			        ]
+			        my_data = [field for field in obraespecialfields]
+			        cur.execute(sql.SQL("INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)").format(sql.Identifier(nometabela)), tuple(my_data))
+			else:
+			    print('.')
+
+
+
+			if categoryid=='20685':
+			    for item in registros:
+			        armadilhafields = [
+			        item['id'],
+			        item['created_at'],
+			        item['updated_at'],
+			        item['name'],
+			        item['image'],
+			        item['project']['name'],
+			        item['category_id'],
+			        item['category']['name'],
+			        item['location']['lat'],
+			        item['location']['lng'],
+			        item['info'][0]['value'],
+			        item['info'][1]['value'],
+			        item['info'][2]['value'],
+			        item['info'][3]['value'],
+			        item['info'][4]['value'],
+			        item['info'][5]['value'],
+			        item['info'][6]['value'],
+			        item['info'][7]['value'],
+			        item['info'][8]['value'],
+			        item['info'][9]['value'],
+			        item['info'][10]['value'],
+			        ]
+			        my_data = [field for field in armadilhafields]
+			        cur.execute(sql.SQL("INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)").format(sql.Identifier(nometabela)), tuple(my_data))
+			else:
+			        print('.')
+			    
+			if categoryid=='20686':
+			    for item in registros:
+			        atropelamentofields = [
+			        item['id'],
+			        item['created_at'],
+			        item['updated_at'],
+			        item['name'],
+			        item['image'],
+			        item['project']['name'],
+			        item['category_id'],
+			        item['category']['name'],
+			        item['location']['lat'],
+			        item['location']['lng'],
+			        item['info'][0]['value'],
+			        item['info'][1]['value'],
+			        item['info'][2]['value'],
+			        item['info'][3]['value'],
+			        item['info'][4]['value'],
+			        item['info'][5]['value'],
+			        item['info'][6]['value'],
+			        item['info'][7]['value'],
+			        item['info'][8]['value'],
+			        item['info'][9]['value'],
+			        item['info'][10]['value'],
+			        item['info'][11]['value'],
+			        item['info'][12]['value'],
+			        item['info'][13]['value'],
+			        item['info'][14]['value']
+			        ]
+			        my_data = [field for field in atropelamentofields]
+			        cur.execute(sql.SQL("INSERT INTO {} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)").format(sql.Identifier(nometabela)), tuple(my_data))
+			else:
+			    print('.')
+			    
+			conn.commit()
+
+			nomeindex=tabelagerada+'index'
+			cur.execute(sql.SQL("UPDATE {} SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326); CREATE INDEX {} ON {} USING GIST(geom)").format(sql.Identifier(tabelagerada), sql.Identifier(nomeindex), sql.Identifier(tabelagerada)))
+			    
+			conn.commit()
+
+			dbsegmentos = """DROP TABLE IF EXISTS {};
+			CREATE UNLOGGED TABLE IF NOT EXISTS {}(
+			nome TEXT PRIMARY KEY,
+			geom geometry(MultiPolygon, 4326)
+			);""" 
+			segmentnome="egrfauna_segmentos"
+			cur.execute(sql.SQL(dbsegmentos).format(sql.Identifier(segmentnome), sql.Identifier(segmentnome)))
+			conn.commit()
+
+			segmentos=requests.get('https://raw.githubusercontent.com/guilhermeiablo/inventsys2infoambiente/master/dados/ERS_segmentos_rodoviarios.geojson')
+
+
+			for feature in segmentos.json()['features']:
+			    geom = (json.dumps(feature['geometry']))
+			    nome=feature['properties']['nome']
+			    cur.execute(sql.SQL("INSERT INTO {} (nome, geom) VALUES (%s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326));").format(sql.Identifier(segmentnome)), (nome, geom))
+			cur.execute(sql.SQL("CREATE INDEX sp_index_segmentos ON {} USING GIST(geom)").format(sql.Identifier(segmentnome)))
+
+			conn.commit()
+
+
+
+			intersecta = '''DROP TABLE IF EXISTS {nome0}; SELECT {nome1}.*, {nome2}.nome INTO {nome0} FROM {nome2} INNER JOIN {nome1} ON ST_Intersects({nome2}.geom, {nome1}.geom) AND {nome2}.nome=%s;'''
+
+			for feature in segmentos.json()['features']:
+			    nomedosegmento=feature['properties']['nome']
+			    if projectid=='10762':
+			        nomecompleto=str(feature['properties']['nome']+'_PMF_'+tabelagerada)
+			    else:
+			        nomecompleto=str(feature['properties']['nome']+'_'+tabelagerada)
+			    cur.execute(sql.SQL(intersecta)
+			                .format(nome0=sql.Identifier(nomecompleto),nome1=sql.Identifier(tabelagerada),nome2=sql.Identifier(segmentnome)),[nomedosegmento,])
+
+
+			conn.commit()
+
+
+
+			return redirect(url_for('logingeoserver', mytoken=session['mytoken'], project=session['project'], category=session['category']))
+		else:
+			flash('Erro ao conectar a base de dados. Tente novamente.', 'danger')
+	return render_template('loginpostgis.html', title='LoginPostgis', form=form, mytoken=mytoken, project=session['project'], category=session['category'])
+
+
+
+
+@app.route("/logingeoserver")
+def logingeoserver():
+	
+	    
+
+
+
+
+
+
+
+
+
+
+
+	return render_template("logingeoserver.html")
+
+
+
+
+
+
+
+
     
 if __name__ == "__main__":
     app.run(debug=True)

@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Login Inventsys</title>
+    <title>Login Postgres</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static',    filename='css/login.css') }}">
 
@@ -27,7 +27,7 @@
         <div class="row">
           <div class="col-md-5"></div>
           <div class="col-md-2">
-            <img src="{{ url_for('static',    filename='img/inventsys.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
+            <img src="{{ url_for('static',    filename='img/postgresql-logo.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
           </div>
         </div> 
         
@@ -36,44 +36,73 @@
    
 
 
-        <div class="row" style="background-color: #FBA919">
+        <div class="row" style="background-color: #5C585C; min-height:60vh">
             <div class="col-md-4"></div>
             <div class="col-md-4">
                 <div class="content-section">
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         <fieldset class="form-group">
-                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;"></br>Entre com suas credenciais Inventsys</legend>
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;"></br>Entre com suas credenciais PostgreSQL</legend>
                             <div class="form-group">
-                                {{ form.username.label(class="form-control-label") }}
-                                {% if form.username.errors %}
-                                    {{ form.username(class="form-control form-control-lg is-invalid") }}
+                                {{ form.hostinput.label(class="form-control-label") }}
+                                {% if form.hostinput.errors %}
+                                    {{ form.hostinput(class="form-control form-control-lg is-invalid") }}
                                     <div class="invalid-feedback">
-                                        {% for error in form.username.errors %}
+                                        {% for error in form.hostinput.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.username(class="form-control form-control-lg") }}
+                                    {{ form.hostinput(class="form-control form-control-lg") }}
                                 {% endif %}
                             </div>
                             <div class="form-group">
-                                {{ form.password.label(class="form-control-label") }}
-                                {% if form.password.errors %}
-                                    {{ form.password(class="form-control form-control-lg is-invalid") }}
+                                {{ form.dbnameinput.label(class="form-control-label") }}
+                                {% if form.dbnameinput.errors %}
+                                    {{ form.dbnameinput(class="form-control form-control-lg is-invalid") }}
                                     <div class="invalid-feedback">
-                                        {% for error in form.password.errors %}
+                                        {% for error in form.dbnameinput.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.password(class="form-control form-control-lg") }}
+                                    {{ form.dbnameinput(class="form-control form-control-lg") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.userinput.label(class="form-control-label") }}
+                                {% if form.userinput.errors %}
+                                    {{ form.userinput(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.userinput.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.userinput(class="form-control form-control-lg") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.senhainput.label(class="form-control-label") }}
+                                {% if form.senhainput.errors %}
+                                    {{ form.senhainput(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.senhainput.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.senhainput(class="form-control form-control-lg") }}
                                 {% endif %}
                             </div>
                             <div class="form-check" style="font-weight:200; text-align:center;">
                                 {{ form.remember(class="form-check-input") }}
                                 {{ form.remember.label(class="form-check-label") }}
                             </div>
+                            
                         </fieldset>
                         <div class="form-group-block">
                             {{ form.submit(class="btn-block btn-raised btn-active") }}
