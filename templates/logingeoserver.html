@@ -29,10 +29,100 @@
           <div class="col-md-2">
             <img src="{{ url_for('static',    filename='img/geoserver.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
           </div>
-        </div> 
-        
-        
+        </div>   
     </div>
+
+    <div class="row" style="background-color: #334863; min-height:60vh">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="content-section">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <fieldset class="form-group">
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;color:white"></br>Entre com suas credenciais Geoserver</legend>
+                            <div class="form-group">
+                                {{ form.urlgeoserver.label(class="form-control-label", style="color:white") }}
+                                {% if form.urlgeoserver.errors %}
+                                    {{ form.urlgeoserver(class="form-control form-control-lg is-invalid", style="color:white") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.urlgeoserver.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.urlgeoserver(class="form-control form-control-lg", style="color:white") }}
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.usrgeoserver.label(class="form-control-label", style="color:white") }}
+                                {% if form.usrgeoserver.errors %}
+                                    {{ form.usrgeoserver(class="form-control form-control-lg is-invalid", style="color:white") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.usrgeoserver.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.usrgeoserver(class="form-control form-control-lg", style="color:white") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.pwdgeoserver.label(class="form-control-label", style="color:white") }}
+                                {% if form.pwdgeoserver.errors %}
+                                    {{ form.pwdgeoserver(class="form-control form-control-lg is-invalid", style="color:white") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.pwdgeoserver.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.pwdgeoserver(class="form-control form-control-lg", style="color:white") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.workspace.label(class="form-control-label", style="color:white") }}
+                                {% if form.workspace.errors %}
+                                    {{ form.workspace(class="form-control form-control-lg is-invalid", style="color:white") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.workspace.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.workspace(class="form-control form-control-lg", style="color:white") }}
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.datastore.label(class="form-control-label", style="color:white") }}
+                                {% if form.datastore.errors %}
+                                    {{ form.datastore(class="form-control form-control-lg is-invalid", style="color:white") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.datastore.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.datastore(class="form-control form-control-lg", style="color:white") }}
+                                {% endif %}
+                            </div>
+                            <div class="form-check" style="font-weight:200; text-align:center;">
+                                {{ form.remember(class="form-check-input") }}
+                                {{ form.remember.label(class="form-check-label", style="color:white") }}
+                            </div>                            
+                        </fieldset>
+                        <div class="form-group-block">
+                            {{ form.submit(class="btn-block btn-raised btn-active") }}
+                        </div>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
    
 
 

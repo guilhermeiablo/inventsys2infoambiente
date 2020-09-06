@@ -5,9 +5,13 @@ from getpass import getpass
 import random , string
 import requests
 import json
-from forms import LoginFormInventsys, ProjectForm, CategoryForm, LoginFormPostgis
+from forms import LoginFormInventsys, ProjectForm, CategoryForm, LoginFormPostgis, LoginFormGeoserver, LoginFormInfoambiente
 import psycopg2
 from psycopg2 import sql
+import geoserver
+from geoserver.catalog import Catalog
+from geoserver.resource import FeatureType
+import re
 
 app = Flask(__name__)
 
@@ -101,7 +105,8 @@ def selectproject():
 	if form.validate_on_submit():	
 		if projetos:
 			session['project'] = str(form.selecionaprojeto.data)
-			flash(f'Projeto {form.selecionaprojeto.data} selecionado com sucesso!', 'success')
+			session['projectname'] = str(dict(form.selecionaprojeto.choices).get(form.selecionaprojeto.data))
+			flash(f'Projeto '+session['projectname']+' selecionado com sucesso!', 'success')
 			return redirect(url_for('selectcategory', mytoken=session['mytoken'], project=session['project']))
 		else:
 			flash('Projeto não pode ser selecionado. Tente novamente.', 'danger')
@@ -147,7 +152,8 @@ def selectcategory():
 	if form.validate_on_submit():	
 		if categorias:
 			session['category'] = str(form.selecionacategoria.data)
-			flash(f'Categoria {form.selecionacategoria.data} selecionado com sucesso!', 'success')
+			session['categoryname'] = str(dict(form.selecionacategoria.choices).get(form.selecionacategoria.data))
+			flash(f'Categoria '+session['categoryname']+' selecionado com sucesso!', 'success')
 			return redirect(url_for('loginpostgis', mytoken=session['mytoken'], project=session['project'], category=session['category']))
 		else:
 			flash('Categoria não pode ser selecionada. Tente novamente.', 'danger')
@@ -556,6 +562,7 @@ def loginpostgis():
 
 
 			conn.commit()
+			session['tabelagerada']=str(tabelagerada)
 
 
 
@@ -567,24 +574,251 @@ def loginpostgis():
 
 
 
-@app.route("/logingeoserver")
+@app.route("/logingeoserver", methods=['GET', 'POST'])
 def logingeoserver():
-	
-	    
+	form = LoginFormGeoserver()
+	mytoken=session.get('mytoken')
+	projectid=session.get('project')
+	categoryid=session.get('category')
+	segmentos=requests.get('https://raw.githubusercontent.com/guilhermeiablo/inventsys2infoambiente/master/dados/ERS_segmentos_rodoviarios.geojson')
+	tabelagerada=session.get('tabelagerada')
+
+
+	if form.validate_on_submit():
+		urlgeoserver = str(form.urlgeoserver.data)
+		usrgeoserver = str(form.usrgeoserver.data)
+		pwdgeoserver = str(form.pwdgeoserver.data)
+		workspace = str(form.workspace.data)
+		datastore = str(form.datastore.data)
+
+
+		cat = Catalog(urlgeoserver, username=usrgeoserver, password=pwdgeoserver)
+		cite = cat.get_workspace("cite")
+		ds = cat.get_store("newDatastoreName", "cite")
+
+
+		ds.connection_parameters.update(host=session.get('hostinput'), port='5432', database=session.get('dbnameinput'), user=session.get('userinput'), passwd=session.get('pwdgeoserver'), dbtype='postgis', schema='public')
+		cat.save(ds)
+
+
+		if cat:
+			
+			flash(f'Dados enviados com sucesso para {form.workspace.data}!', 'success')
+
+
+			for feature in segmentos.json()['features']:
+			    if projectid=='10762':
+			        nomedolayer=str(str(feature['properties']['nome'])+'_PMF_'+str(tabelagerada))
+			    else:
+			        nomedolayer=str(str(feature['properties']['nome'])+'_'+str(tabelagerada))
+			        
+			    while True:
+			        try:
+			            ft = cat.publish_featuretype(nomedolayer, ds, 'EPSG:4326', srs='EPSG:4326')
+
+			        except:
+			            # for handle unknown exception
+			            # define your parameters
+			            urldatastore = urlgeoserver+'reset'
+			            headersdatastore = {'Content-Type': 'text/xml'}
+			            authdatastore = (usrgeoserver, pwdgeoserver)
+			            r = requests.post(urldatastore, headers=headersdatastore, auth=authdatastore)
+			            break
+
+			return redirect(url_for('logininfoambiente', mytoken=session['mytoken'], project=session['project'], category=session['category']))
+		else:
+			flash('Erro ao conectar a base de dados. Tente novamente.', 'danger')
 
 
 
+	return render_template("logingeoserver.html", title='LoginGeoserver', form=form, mytoken=mytoken, project=session['project'], category=session['category'])
+
+@app.route("/logininfoambiente", methods=['GET', 'POST'])
+def logininfoambiente():
+	form = LoginFormInfoambiente()
+	mytoken=session.get('mytoken')
+	projectid=session.get('project')
+	categoryid=session.get('category')
+	segmentos=requests.get('https://raw.githubusercontent.com/guilhermeiablo/inventsys2infoambiente/master/dados/ERS_segmentos_rodoviarios.geojson')
+	tabelagerada=session.get('tabelagerada')
+	if form.validate_on_submit():
+		usrinfoambiente = str(form.usrinfoambiente.data)
+		pwdinfoambiente = str(form.pwdinfoambiente.data)
+
+
+		URL = 'http://www.infoambiente.stesa.com.br/egr'
+
+		rsession = requests.session()
+
+		front = rsession.get(URL)
+		csrf_token = re.findall(r'<input type="hidden" name="_token" value="(.*)"', 
+		front.text)[0]
+		cookies = rsession.cookies
+
+
+		payload = {
+		    'usuario': usrinfoambiente,
+		    'password': pwdinfoambiente,
+		    'projeto': 'egr',
+		    'X-XSRF-TOKEN': csrf_token,
+		    '_token': csrf_token
+		}
+
+		r = requests.request('POST', 'http://www.infoambiente.stesa.com.br/login', data=payload, cookies=cookies)
+		cookies = r.cookies
+		egr = requests.request('GET', 'http://www.infoambiente.stesa.com.br/egr', data=payload, cookies=cookies)
+		quarentaeum = requests.request('GET', 'http://www.infoambiente.stesa.com.br/tree/41', data=payload, cookies=cookies)
+		
+
+
+		if egr:
+
+			for i in range(0,len(quarentaeum.json())):
+			    if quarentaeum.json()[i]['text']=='Núcleo 01':
+			        nodenucleo1=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['text']=='Núcleo 02':
+			        nodenucleo2=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['text']=='Núcleo 03':
+			        nodenucleo3=quarentaeum.json()[i]['id']
+
+			for i in range(0,len(quarentaeum.json())):
+			    if quarentaeum.json()[i]['parent']==nodenucleo1:
+			        if quarentaeum.json()[i]['text']=='Programas Ambientais':
+			            nodeprogramas1=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['parent']==nodenucleo2:
+			        if quarentaeum.json()[i]['text']=='Programas Ambientais':
+			            nodeprogramas2=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['parent']==nodenucleo3:
+			        if quarentaeum.json()[i]['text']=='Programas Ambientais':
+			            nodeprogramas3=quarentaeum.json()[i]['id']
+
+			programasambientais=[]            
+			for i in range(0,len(quarentaeum.json())):
+			    if quarentaeum.json()[i]['parent']==nodeprogramas1:
+			        programasambientais.append(quarentaeum.json()[i]['text'])
+
+			for i in range(0,len(quarentaeum.json())):
+			    if quarentaeum.json()[i]['parent']==nodeprogramas1:
+			        if quarentaeum.json()[i]['text']==programaid:
+			            nodeprogramaescolhido1=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['parent']==nodeprogramas2:
+			        if quarentaeum.json()[i]['text']==programaid:
+			            nodeprogramaescolhido2=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['parent']==nodeprogramas3:
+			        if quarentaeum.json()[i]['text']==programaid:
+			            nodeprogramaescolhido3=quarentaeum.json()[i]['id']
+
+			for i in range(0,len(quarentaeum.json())):
+			    if quarentaeum.json()[i]['parent']==nodeprogramaescolhido1:
+			        if quarentaeum.json()[i]['text']=='ERS-115':
+			            noders115=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-239':
+			            noders239=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-474':
+			            noders474=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-020':
+			            noders020=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-235':
+			            noders235=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-466':
+			            noders466=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['parent']==nodeprogramaescolhido2:
+			        if quarentaeum.json()[i]['text']=='ERS-129':
+			            noders129=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-130':
+			            noders130=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-135':
+			            noders135=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='RSC-287 Trecho 1 e 2':
+			            noders287t1e2=quarentaeum.json()[i]['id']
+			    if quarentaeum.json()[i]['parent']==nodeprogramaescolhido3:
+			        if quarentaeum.json()[i]['text']=='ERS-240':
+			            noders240=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-122':
+			            noders122=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-784':
+			            noders784=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-040':
+			            noders040=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='ERS-128':
+			            noders128=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='RSC-453':
+			            noders453=quarentaeum.json()[i]['id']
+			        if quarentaeum.json()[i]['text']=='RSC-287 Trecho 3':
+			            noders287t3=quarentaeum.json()[i]['id']
+
+			#Adicionar camada
+			for feature in segmentos.json()['features']:
+			    if projectid=='10762':
+			        nomedolayer=str(feature['properties']['nome']+'_PMF_'+tabelagerada)
+			    else:
+			        nomedolayer=str(feature['properties']['nome']+'_'+tabelagerada)
+			    if 'ERS115' in nomedolayer:
+			        parentecamada = noders115[5:9]
+			    if 'ERS239' in nomedolayer:
+			        parentecamada = noders239[5:9]
+			    if 'ERS474' in nomedolayer:
+			        parentecamada = noders474[5:9]
+			    if 'ERS020' in nomedolayer:
+			        parentecamada = noders020[5:9]
+			    if 'ERS235' in nomedolayer:
+			        parentecamada = noders235[5:9]
+			    if 'ERS466' in nomedolayer:
+			        parentecamada = noders466[5:9]
+			    if 'ERS129' in nomedolayer:
+			        parentecamada = noders129[5:9]
+			    if 'ERS130' in nomedolayer:
+			        parentecamada = noders130[5:9]
+			    if 'ERS135' in nomedolayer:
+			        parentecamada = noders135[5:9]
+			    if 'RSC287_P' in nomedolayer:
+			        parentecamada = noders287t1e2[5:9]
+			    if 'RSC287_T' in nomedolayer:
+			        parentecamada = noders287t3[5:9]
+			    if 'ERS240' in nomedolayer:
+			        parentecamada = noders240[5:9]
+			    if 'ERS122' in nomedolayer:
+			        parentecamada = noders122[5:9]
+			    if 'ERS784' in nomedolayer:
+			        parentecamada = noders784[5:9]
+			    if 'ERS040' in nomedolayer:
+			        parentecamada = noders040[5:9]
+			    if 'ERS128' in nomedolayer:
+			        parentecamada = noders128[5:9]
+			    if 'RSC453' in nomedolayer:
+			        parentecamada = noders453[5:9]
+			    payloadcamadas = {
+			        'projetoCamada': '41',
+			        'parenteCamada': parentecamada,
+			        'nomeCamada': nomedolayer,
+			        'nomeOriginalCamada': nomedolayer,
+			        'ativaCamada': '0',
+			        'X-XSRF-TOKEN': csrf_token,
+			        '_token': csrf_token
+			    }
+			    
+			    while True:
+			        try:
+			            uppa = requests.request('POST', 'http://www.infoambiente.stesa.com.br/camadas', data=payloadcamadas, cookies=cookies)
+			        except:
+			            quarentaeum = requests.request('GET', 'http://www.infoambiente.stesa.com.br/tree/41', data=payload, cookies=cookies)
+			            break
+			
+			flash(f'Dados enviados com sucesso para o Infoambiente com o usuário {form.usrinfoambiente.data}!', 'success')
+
+			return redirect(url_for('success', mytoken=session['mytoken'], project=session['project'], category=session['category']))
+		else:
+			flash('Erro ao conectar a base de dados. Tente novamente.', 'danger')
 
 
 
+	return render_template("logininfoambiente.html", title='LoginInfoambiente', form=form, mytoken=mytoken, project=session['project'], category=session['category'])
 
 
+@app.route("/success")
+def success():
 
-
-
-	return render_template("logingeoserver.html")
-
-
+	return render_template("success.html", mytoken=session['mytoken'], projectname=session['projectname'], categoryname=session['categoryname'])
 
 
 

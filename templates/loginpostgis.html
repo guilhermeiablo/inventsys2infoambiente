@@ -43,64 +43,64 @@
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         <fieldset class="form-group">
-                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;"></br>Entre com suas credenciais PostgreSQL</legend>
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;color:white"></br>Entre com suas credenciais PostgreSQL</legend>
                             <div class="form-group">
-                                {{ form.hostinput.label(class="form-control-label") }}
+                                {{ form.hostinput.label(class="form-control-label", style="color:white") }}
                                 {% if form.hostinput.errors %}
-                                    {{ form.hostinput(class="form-control form-control-lg is-invalid") }}
+                                    {{ form.hostinput(class="form-control form-control-lg is-invalid", style="color:white") }}
                                     <div class="invalid-feedback">
                                         {% for error in form.hostinput.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.hostinput(class="form-control form-control-lg") }}
+                                    {{ form.hostinput(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
                             <div class="form-group">
-                                {{ form.dbnameinput.label(class="form-control-label") }}
+                                {{ form.dbnameinput.label(class="form-control-label", style="color:white") }}
                                 {% if form.dbnameinput.errors %}
-                                    {{ form.dbnameinput(class="form-control form-control-lg is-invalid") }}
+                                    {{ form.dbnameinput(class="form-control form-control-lg is-invalid", style="color:white") }}
                                     <div class="invalid-feedback">
                                         {% for error in form.dbnameinput.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.dbnameinput(class="form-control form-control-lg") }}
+                                    {{ form.dbnameinput(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
                             
                             <div class="form-group">
-                                {{ form.userinput.label(class="form-control-label") }}
+                                {{ form.userinput.label(class="form-control-label", style="color:white") }}
                                 {% if form.userinput.errors %}
-                                    {{ form.userinput(class="form-control form-control-lg is-invalid") }}
+                                    {{ form.userinput(class="form-control form-control-lg is-invalid", style="color:white") }}
                                     <div class="invalid-feedback">
                                         {% for error in form.userinput.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.userinput(class="form-control form-control-lg") }}
+                                    {{ form.userinput(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
                             
                             <div class="form-group">
-                                {{ form.senhainput.label(class="form-control-label") }}
+                                {{ form.senhainput.label(class="form-control-label", style="color:white") }}
                                 {% if form.senhainput.errors %}
-                                    {{ form.senhainput(class="form-control form-control-lg is-invalid") }}
+                                    {{ form.senhainput(class="form-control form-control-lg is-invalid", style="color:white") }}
                                     <div class="invalid-feedback">
                                         {% for error in form.senhainput.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.senhainput(class="form-control form-control-lg") }}
+                                    {{ form.senhainput(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
                             <div class="form-check" style="font-weight:200; text-align:center;">
-                                {{ form.remember(class="form-check-input") }}
-                                {{ form.remember.label(class="form-check-label") }}
+                                {{ form.remember(class="form-check-input", style="color:white") }}
+                                {{ form.remember.label(class="form-check-label", style="color:white") }}
                             </div>
                             
                         </fieldset>

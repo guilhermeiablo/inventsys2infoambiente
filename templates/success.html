@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta property="og:image" content="{{ url_for('static',    filename='img/logo.png') }}">
+    <meta name="twitter:image" content="{{ url_for('static',    filename='img/logo.png') }}">
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Inventsys2Infoambiente</title>
+  </head>
+  <body>
+    {% extends "template.html" %}
+    {% block content %}
+    
+    <div class="container">
+        
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="col-md-6">
+            <img src="{{ url_for('static',    filename='img/logo.png') }}" style="align-self: center; max-width: 100%"></img>
+          </div>
+          </div> 
+        
+        </div>
+
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="col-md-6" style="text-align: justify;">
+            <h3></br> Dados migrados com sucesso! </h3>
+            <p style="font-weight:200"> Você acaba de migrar dados da Categoria <b>{{categoryname}}</b> da Operação <b>{{projectname}}</b> do <a href="http://stesa.ch.inventsys.com.br" target="_blank">Inventsys</a>. Visualize os resultados no <a href="http://www.infoambiente.stesa.com.br/egr" target="_blank">Infoambiente</a>.</br></br> Para migrar dados de outra Operação ou Categoria, clique no botão abaixo.</p></br>
+
+            <a href="{{ url_for('home') }}">
+              <div class="btn btn-block btn-raised btn-active"style="background-color: #0F3F68 !important; color: #FBA919 !important">
+              Recomeçar
+              </div>
+            </a>
+          </div>  
+          </div>
+        </div>
+    
+    {% endblock %}
+  </body>
+</html>

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
+    <meta property="og:image" content="{{ url_for('static',    filename='img/logo.png') }}">
+    <meta name="twitter:image" content="{{ url_for('static',    filename='img/logo.png') }}">
     <meta charset="utf-8">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <title>Inventsys2Infoambiente</title>
@@ -14,7 +16,7 @@
         <div class="row">
           <div class="col-md-3"></div>
           <div class="col-md-6">
-            <img src="{{ url_for('static',    filename='img/logo.png') }}" style="align-self: center"></img>
+            <img src="{{ url_for('static',    filename='img/logo.png') }}" style="align-self: center; max-width: 100%"></img>
           </div>
           </div> 
         
@@ -24,15 +26,25 @@
           <div class="col-md-3"></div>
           <div class="col-md-6" style="text-align: justify;">
             <h3></br> Bem vindo(a)! </h3>
-            <p style="font-weight:200"> Este é o aplicativo de migração de dados da plataforma <a href="http://stesa.ch.inventsys.com.br" target="_blank">Inventsys</a> para o visualizador do <a href="http://www.infoambiente.stesa.com.br/egr" target="_blank">Infoambiente</a>.</br></br>Informe suas credenciais em cada um dos passos para migrar automaticamente o conjunto de dados de qualquer categoria de ativo do Inventsys para o Núcleo correspondente do Infoambiente. Não se esqueça de ter em mãos as credenciais para os dois sistemas, mas também para as bases PostgreSQL e Geoserver.</p></br>
+            <p style="font-weight:200"> Este é o aplicativo de migração de dados da plataforma <a href="http://stesa.ch.inventsys.com.br" target="_blank" style="color: #FBA919">Inventsys</a> para o visualizador do <a href="http://www.infoambiente.stesa.com.br/egr" target="_blank" style="color:#0F3F68">Infoambiente</a>.</br></p>
+
+            <img src="{{ url_for('static',    filename='img/Etapas.gif') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
+          
+
+            </br></br><p>Clique no botão abaixo para informar suas credenciais em cada um dos passos para migrar automaticamente o conjunto de dados de qualquer categoria de ativo do Inventsys para o Núcleo correspondente do Infoambiente. Não se esqueça de ter em mãos as credenciais para os dois sistemas, mas também para as bases PostgreSQL e Geoserver.</p></br>
 
             <a href="{{ url_for('validateinventsys') }}">
-              <div class="btn btn-block btn-raised btn-active">
+              <div class="btn btn-block btn-raised btn-active" style="background-color: #0F3F68 !important; color: #FBA919 !important">
               Começar
               </div>
             </a>
           </div>  
           </div>
+
+
+
+
+
         </div>
     
     {% endblock %}
