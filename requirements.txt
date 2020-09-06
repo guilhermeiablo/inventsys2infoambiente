@@ -18,3 +18,4 @@ Flask-Session==0.3.2
 Flask-SQLAlchemy==2.4.4
 psycopg2==2.8.5
 SQLAlchemy==1.3.13
+geoserver-restconfig==2.0.3
