@@ -20,19 +20,19 @@ class CategoryForm(FlaskForm):
     submit= SubmitField('Enviar') 
 
 class LoginFormPostgis(FlaskForm):
-	hostinput = StringField('Host', validators=[DataRequired()], default='localhost')
+	hostinput = StringField('Host', validators=[DataRequired()], default='infoambienteazure.postgres.database.azure.com')
 	dbnameinput = StringField('Name', validators=[DataRequired()], default='postgres')
-	userinput = StringField('Usuário', validators=[DataRequired()], default='guilhermeiablonovski')
+	userinput = StringField('Usuário', validators=[DataRequired()], default='infoambiente@infoambienteazure')
 	senhainput= PasswordField('Senha')
 	remember = BooleanField('Salvar meus dados')
 	submit= SubmitField('Enviar') 
 
 class LoginFormGeoserver(FlaskForm):
-	urlgeoserver = StringField('URL REST Geoserver', validators=[DataRequired()], default='http://localhost:8080/geoserver/rest/')
+	urlgeoserver = StringField('URL REST Geoserver', validators=[DataRequired()], default='http://www.infoambiente.stesa.com.br:8080/geoserver/rest/')
 	usrgeoserver = StringField('Usuário', validators=[DataRequired()], default='admin')
-	pwdgeoserver = PasswordField('Senha', validators=[DataRequired()], default='geoserver')
-	workspace = StringField('Workspace', validators=[DataRequired()], default='cite')
-	datastore = StringField('Datastore', validators=[DataRequired()], default='newDatastoreName')
+	pwdgeoserver = PasswordField('Senha', validators=[DataRequired()])
+	workspace = StringField('Workspace', validators=[DataRequired()], default='InfoAmbiente')
+	datastore = StringField('Datastore', validators=[DataRequired()], default='InfoambienteAzure')
 	remember = BooleanField('Salvar meus dados')
 	submit= SubmitField('Enviar') 
 
@@ -41,6 +41,10 @@ class LoginFormInfoambiente(FlaskForm):
 	pwdinfoambiente = PasswordField('Senha', validators=[DataRequired()])
 	remember = BooleanField('Salvar meus dados')
 	submit= SubmitField('Enviar') 
+
+class ProgramaForm(FlaskForm):
+    selecionaprograma = SelectField('Programa Ambiental')
+    submit= SubmitField('Enviar') 
 
 
 

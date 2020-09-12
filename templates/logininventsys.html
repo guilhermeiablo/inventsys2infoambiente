@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <title>Login Inventsys</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static',    filename='css/login.css') }}">
 
+    <link rel="stylesheet" href="{{ url_for('static',    filename='css/template.css') }}">
 
     
 
@@ -16,6 +16,7 @@
 
     {% block content %}
 
+        
         <div class="row">
           <div class="col-md-3"></div>
           <div class="col-md-6">
@@ -45,54 +46,66 @@
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         <fieldset class="form-group">
-                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;"></br>Entre com suas credenciais Inventsys</legend>
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;color:white"></br>Entre com suas credenciais Inventsys</legend>
                             <div class="form-group">
-                                {{ form.username.label(class="form-control-label") }}
+                                {{ form.username.label(class="form-control-label", style="color:white") }}
                                 {% if form.username.errors %}
-                                    {{ form.username(class="form-control form-control-lg is-invalid") }}
+                                    {{ form.username(class="form-control form-control-lg is-invalid", style="color:white") }}
                                     <div class="invalid-feedback">
                                         {% for error in form.username.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.username(class="form-control form-control-lg") }}
+                                    {{ form.username(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
                             <div class="form-group">
-                                {{ form.password.label(class="form-control-label") }}
+                                {{ form.password.label(class="form-control-label", style="color:white") }}
                                 {% if form.password.errors %}
-                                    {{ form.password(class="form-control form-control-lg is-invalid") }}
+                                    {{ form.password(class="form-control form-control-lg is-invalid", style="color:white") }}
                                     <div class="invalid-feedback">
                                         {% for error in form.password.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.password(class="form-control form-control-lg") }}
+                                    {{ form.password(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
                             <div class="form-check" style="font-weight:200; text-align:center;">
                                 {{ form.remember(class="form-check-input") }}
-                                {{ form.remember.label(class="form-check-label") }}
+                                {{ form.remember.label(class="form-check-label", style="color:white") }}
                             </div>
                         </fieldset>
                         <div class="form-group-block btn-block btn-raised btn-active">
-                            {{ form.submit(class="btn-block btn-raised btn-active") }}
+                            {{ form.submit(class="btn-block btn-raised btn-active", value="Enviar", type="submit", onclick="loading()") }}
                         </div>
                         
                     </form>
                     
+
+                    
                 </div>
+
                 
                 </div>
 
             </div>
         </div>
+        
+
+
+
+
+
+
+
 
 
    
       
     {% endblock content %}
+
   </body>
 </html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Seleciona Programa Ambiental</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+
+    
+
+  </head>
+  <body>
+    {% extends "template.html" %}
+
+
+    {% block content %}
+
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="col-md-6">
+            <img src="{{ url_for('static',    filename='img/Etapas-07.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
+          </div>
+        </div> 
+        
+
+        <div class="row">
+          <div class="col-md-5"></div>
+          <div class="col-md-2">
+            <img src="{{ url_for('static',    filename='img/infoambiente2.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
+          </div>
+        </div> 
+        
+        
+    </div>
+   
+
+
+        <div class="row" style="background-color: #0E4069; min-height:60vh">
+            
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="container">
+                <div class="content-section">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <fieldset class="form-group">
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem; color:white;"></br>Selecione o programa ambiental do Infoambiente</legend>
+                            <div class="form-group">
+                                {{ form.selecionaprograma.label(class="form-control-label", style="color:white") }}
+                                {% if form.selecionaprograma.errors %}
+                                    {{ form.selecionaprograma(class="form-control form-control-lg is-invalid", style="color:white") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.selecionaprograma.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.selecionaprograma(class="form-control form-control-lg", style="color:white") }}
+                                {% endif %}
+                            </div>
+                            
+                        </fieldset>
+                      
+                        <button class="form-group-block btn-block" id="upperbutton" style="background-color:#0E4069; border-width:0;">
+                            {{ form.submit(class="btn-block btn-raised btn-active", value="Enviar",type="submit", id='btnFetch') }}
+                            
+                        </button>
+                        
+                    </form>
+                    
+                </div>
+                
+                </div>
+            </div>
+        </div>
+
+
+   
+      
+    {% endblock content %}
+  </body>
+</html>

@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <title>Login Geoserver</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static',    filename='css/login.css') }}">
 
 
     
@@ -32,7 +31,7 @@
         </div>   
     </div>
 
-    <div class="row" style="background-color: #334863; min-height:60vh">
+    <div class="row" style="background-color: #51555D; min-height:60vh">
             <div class="col-md-4"></div>
             <div class="col-md-4">
                 <div class="content-section">
@@ -112,9 +111,10 @@
                                 {{ form.remember.label(class="form-check-label", style="color:white") }}
                             </div>                            
                         </fieldset>
-                        <div class="form-group-block">
-                            {{ form.submit(class="btn-block btn-raised btn-active") }}
-                        </div>
+                        <button class="form-group-block btn-block" id="upperbutton" style="background-color:#51555D; border-width:0;">
+                            {{ form.submit(class="btn-block btn-raised btn-active", value="Enviar",type="submit", id='btnFetch') }}
+                            
+                        </button>
                         
                     </form>
                 </div>

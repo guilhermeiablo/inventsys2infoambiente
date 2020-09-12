@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Inventsys Categoria</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static',    filename='css/login.css') }}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
     
@@ -36,7 +36,7 @@
    
 
 
-        <div class="row" style="background-color: #846D50; min-height:60vh">
+        <div class="row" style="background-color: #9D7748; min-height:60vh">
             
             <div class="col-md-4"></div>
             <div class="col-md-4">
@@ -61,9 +61,11 @@
                             </div>
                             
                         </fieldset>
-                        <div class="form-group-block btn-block btn-raised btn-active">
-                            {{ form.submit(class="btn-block btn-raised btn-active") }}
-                        </div>
+                      
+                        <button class="form-group-block btn-block" id="upperbutton" style="background-color:#9D7748; border-width:0;">
+                            {{ form.submit(class="btn-block btn-raised btn-active", value="Enviar",type="submit", id='btnFetch') }}
+                            
+                        </button>
                         
                     </form>
                     

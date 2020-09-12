@@ -37,7 +37,7 @@
 
 
 
-<div class="row" style="background-color: #B6853D; min-height:60vh">
+<div class="row" style="background-color: #CA8E35; min-height:60vh">
             
             <div class="col-md-4"></div>
             <div class="col-md-4">
@@ -46,18 +46,18 @@
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         <fieldset class="form-group">
-                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;"></br>Selecione uma operação do Inventsys</legend>
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;color:white"></br>Selecione uma operação do Inventsys</legend>
                             <div class="form-group">
-                                {{ form.selecionaprojeto.label(class="form-control-label") }}
+                                {{ form.selecionaprojeto.label(class="form-control-label", style="color:white") }}
                                 {% if form.selecionaprojeto.errors %}
-                                    {{ form.selecionaprojeto(class="form-control form-control-lg is-invalid") }}
+                                    {{ form.selecionaprojeto(class="form-control form-control-lg is-invalid", style="color:white") }}
                                     <div class="invalid-feedback">
                                         {% for error in form.selecionaprojeto.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}
-                                    {{ form.selecionaprojeto(class="form-control form-control-lg") }}
+                                    {{ form.selecionaprojeto(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
                             

@@ -2,9 +2,8 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Login Inventsys</title>
+    <title>Login Infoambiente</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static',    filename='css/login.css') }}">
 
 
     
@@ -27,7 +26,7 @@
         <div class="row">
           <div class="col-md-5"></div>
           <div class="col-md-2">
-            <img src="{{ url_for('static',    filename='img/infoambiente.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
+            <img src="{{ url_for('static',    filename='img/infoambiente1.png') }}" style="align-self: center; max-width:100%; max-height:100%; height:auto"></img>
           </div>
         </div> 
         
@@ -36,14 +35,14 @@
    
 
 
-        <div class="row" style="background-color: #0C4069; min-height:60vh">
+        <div class="row" style="background-color: #304762; min-height:60vh">
             <div class="col-md-4"></div>
             <div class="col-md-4">
                 <div class="content-section">
                     <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         <fieldset class="form-group">
-                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;color:white"></br>Entre com suas credenciais Inventsys</legend>
+                            <legend class="border-bottom mb-2" style="font-weight:200; text-align:center;font-size:1.2rem;color:white"></br>Entre com suas credenciais Infoambiente</legend>
                             <div class="form-group">
                                 {{ form.usrinfoambiente.label(class="form-control-label", style="color:white") }}
                                 {% if form.usrinfoambiente.errors %}
@@ -75,9 +74,10 @@
                                 {{ form.remember.label(class="form-check-label", style="color:white") }}
                             </div>
                         </fieldset>
-                        <div class="form-group-block">
-                            {{ form.submit(class="btn-block btn-raised btn-active") }}
-                        </div>
+                        <button class="form-group-block btn-block" id="upperbutton" style="background-color:#304762; border-width:0;">
+                            {{ form.submit(class="btn-block btn-raised btn-active", value="Enviar",type="submit", id='btnFetch') }}
+                            
+                        </button>
                         
                     </form>
                 </div>

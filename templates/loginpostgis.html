@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <title>Login Postgres</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static',    filename='css/login.css') }}">
 
 
     
@@ -36,7 +35,7 @@
    
 
 
-        <div class="row" style="background-color: #5C585C; min-height:60vh">
+        <div class="row" style="background-color: #756355; min-height:60vh">
             <div class="col-md-4"></div>
             <div class="col-md-4">
                 <div class="content-section">
@@ -104,9 +103,10 @@
                             </div>
                             
                         </fieldset>
-                        <div class="form-group-block">
-                            {{ form.submit(class="btn-block btn-raised btn-active") }}
-                        </div>
+                        <button class="form-group-block btn-block" id="upperbutton" style="background-color:#756355; border-width:0;">
+                            {{ form.submit(class="btn-block btn-raised btn-active", value="Enviar",type="submit", id='btnFetch') }}
+                            
+                        </button>
                         
                     </form>
                 </div>
