@@ -58,6 +58,19 @@
                                     {{ form.selecionaprograma(class="form-control form-control-lg", style="color:white") }}
                                 {% endif %}
                             </div>
+                            <div class="form-group">
+                                {{ form.novonome.label(class="form-control-label", style="color:white") }}
+                                {% if form.novonome.errors %}
+                                    {{ form.novonome(class="form-control form-control-lg is-invalid", style="color:white") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.novonome.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.novonome(class="form-control form-control-lg", style="color:white") }}
+                                {% endif %}
+                            </div>
                             
                         </fieldset>
                       

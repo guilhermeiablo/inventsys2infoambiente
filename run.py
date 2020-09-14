@@ -12,6 +12,7 @@ import geoserver
 from geoserver.catalog import Catalog
 from geoserver.resource import FeatureType
 import re
+import datetime
 
 app = Flask(__name__)
 
@@ -150,6 +151,8 @@ def selectcategory():
 		if categorias:
 			session['category'] = str(form.selecionacategoria.data)
 			session['categoryname'] = str(dict(form.selecionacategoria.choices).get(form.selecionacategoria.data))
+			session['inicio']=form.inicio.data
+			session['fim']=form.fim.data
 			flash(f'Categoria '+session['categoryname']+' selecionado com sucesso!', 'success')
 			return redirect(url_for('loginpostgis', mytoken=session['mytoken'], project=session['project'], category=session['category']))
 		else:
@@ -172,31 +175,43 @@ def loginpostgis():
   		'Token': mytoken,
 	}
 	page = 1
-	registros = []
+	registrosbruto = []
 	projectid = session.get('project')
 	categoryid = session.get('category')
+	datainicio = session.get('inicio')
+	datafim = session.get('fim')
 	while True:
 	    try:
-	        url = 'https://api.inventsys.com.br/v4/projects/'+projectid+'/items?category='+categoryid+'&pagesize=1&page='+str(page)
+	        url = 'https://api.inventsys.com.br/v4/projects/'+projectid+'/items?category='+categoryid+'&pagesize=1&page='+str(page)+'&since='+str(datainicio)
 	        ativos = requests.request('GET', url, headers=headers, data=payload, allow_redirects=False)
 	        
-	        registros = registros + ativos.json()['items']
-	        
-	    except HTTPError:
-	        # handle HTTPError
-	        logging.error('HTTPError')
+	        registrosbruto = registrosbruto + ativos.json()['items']
 	    # ... put any other Exception you need to handle here
 	    except IndexError:
 	        break
-	    except Exception as e:
-	        # for handle unknown exception
-	        logging.error('Unknown exception')
 	    else:
 	        if len(ativos.json()['items'])==0:
 	            break
 	        else:
 	            page += 1
 
+
+	registros=[]
+	for i in range(0,len(registrosbruto)):
+	    ano=int(registrosbruto[i]['updated_at'][0:4])
+	    mes=int(registrosbruto[i]['updated_at'][5:7])
+	    dia=int(registrosbruto[i]['updated_at'][8:10])
+	    dataobjeto = datetime.date(ano, mes, dia)
+	    if dataobjeto<datafim:
+	        registros.append(registrosbruto[i])
+	
+	ano=datafim.year
+	mes=datafim.month
+	if mes<10:
+		dataref=str(ano)+'0'+str(mes)
+	else:
+		dataref=str(ano)+str(mes)
+	session['dataref']=dataref
 
 	form = LoginFormPostgis()
 	if form.validate_on_submit():
@@ -226,7 +241,7 @@ def loginpostgis():
 			dropdbgenerica = """CREATE EXTENSION IF NOT EXISTS postgis;
 			DROP TABLE IF EXISTS {}""" 
 
-			nometabela=projectid+'_'+categoryid
+			nometabela=dataref+'_'+projectid+'_'+categoryid
 
 			createdbgenerica = """CREATE UNLOGGED TABLE IF NOT EXISTS {}(
 			id integer PRIMARY KEY,
@@ -353,28 +368,28 @@ def loginpostgis():
 			if categoryid=='20685':
 			    cur.execute(sql.SQL(dbarmadilhas)
 			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
-			    tabelagerada=projectid+'_'+categoryid
+			    tabelagerada=dataref+'_'+projectid+'_'+categoryid
 			else:
 			    if categoryid=='20686':
 			        cur.execute(sql.SQL(dbatropelamentos)
 			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
-			        tabelagerada=projectid+'_'+categoryid
+			        tabelagerada=dataref+'_'+projectid+'_'+categoryid
 			    else:
 			        if categoryid=='18278':
 			            cur.execute(sql.SQL(dbobraespecial)
 			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
-			            tabelagerada=projectid+'_'+categoryid
+			            tabelagerada=dataref+'_'+projectid+'_'+categoryid
 			        else:
 			            if categoryid=='18284':
 			                cur.execute(sql.SQL(dbobracorrente)
 			                .format(sql.Identifier(nometabela), sql.Identifier(nometabela)))
-			                tabelagerada=projectid+'_'+categoryid
+			                tabelagerada=dataref+'_'+projectid+'_'+categoryid
 			            else:
 			                cur.execute(sql.SQL(dropdbgenerica)
 			                            .format(sql.Identifier(nometabela)))
 			                cur.execute(sql.SQL(createdbgenerica)
 			                            .format(sql.Identifier(nometabela)))
-			                tabelagerada=projectid+'_'+categoryid
+			                tabelagerada=dataref+'_'+projectid+'_'+categoryid
 
 			conn.commit()
 
@@ -725,7 +740,7 @@ def logininfoambiente():
 @app.route("/selectprograma", methods=['GET', 'POST'])
 def selectprograma():
 	form = ProgramaForm()
-	form.selecionaprograma.choices = session.get('programasambientais')
+	form.selecionaprograma.choices = sorted(session.get('programasambientais'))
 	mytoken=session.get('mytoken')
 	projectid=session.get('project')
 	categoryid=session.get('category')
@@ -837,15 +852,27 @@ def selectprograma():
 		        parentecamada = noders128[5:9]
 		    if 'RSC453' in nomedolayer:
 		        parentecamada = noders453[5:9]
-		    payloadcamadas = {
-		        'projetoCamada': '41',
-		        'parenteCamada': parentecamada,
-		        'nomeCamada': nomedolayer,
-		        'nomeOriginalCamada': nomedolayer,
-		        'ativaCamada': '0',
-		        'X-XSRF-TOKEN': csrf_token,
-		        '_token': csrf_token
-		    }
+		    
+		    if not str(form.novonome.data):
+			    payloadcamadas = {
+			        'projetoCamada': '41',
+			        'parenteCamada': parentecamada,
+			        'nomeCamada': nomedolayer,
+			        'nomeOriginalCamada': nomedolayer,
+			        'ativaCamada': '0',
+			        'X-XSRF-TOKEN': csrf_token,
+			        '_token': csrf_token
+			    }
+		    else:
+			    payloadcamadas = {
+			        'projetoCamada': '41',
+			        'parenteCamada': parentecamada,
+			        'nomeCamada': str(form.novonome.data),
+			        'nomeOriginalCamada': nomedolayer,
+			        'ativaCamada': '0',
+			        'X-XSRF-TOKEN': csrf_token,
+			        '_token': csrf_token
+			    }
 		    
 		    while True:
 		        try:
