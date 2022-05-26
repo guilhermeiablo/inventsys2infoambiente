@@ -4,7 +4,7 @@ Flask-WTF==0.14.3
 requests==2.22.0
 WTForms==2.3.2
 gunicorn==19.9.0
-ujson==1.35
+ujson==5.2.0
 json5==0.9.1
 jsonschema==3.2.0
 python-jsonrpc-server==0.3.4
